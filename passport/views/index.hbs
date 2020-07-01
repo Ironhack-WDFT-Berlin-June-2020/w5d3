@@ -1,0 +1,13 @@
+<h1>{{title}}</h1>
+<p>Welcome {{#if user}}{{user.username}}{{/if}} ❤️</p>
+<p>His hashed password is: {{user.password}}</p>
+
+{{#if user}}
+<a href="/rooms/add">Add a room</a>
+<a href="/rooms">See rooms</a>
+<a href="/private">Private</a>
+<a href="/auth/logout">Logout</a>
+{{else}}
+<a href="/auth/signup">Signup</a>
+<a href="/auth/login">Login</a>
+{{/if}}
