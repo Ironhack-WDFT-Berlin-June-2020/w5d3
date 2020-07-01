@@ -5,9 +5,6 @@ https://stackoverflow.com/questions/27637609/understanding-passport-serialize-de
 
 
 
-Show the User model - without the github id and the roles
-
-Show the signup - it is the same as in basic auth
 
 Now we want to use passport for the login 
 #### The different forms of authentication are called strategies in passport
@@ -183,8 +180,11 @@ https://github.com/jaredhanson/passport-github
 
 - github secret
 
+```bash
 $ npm install passport-github
+```
 
+```js
 // app.js
 const GithubStrategy = require('passport-github').Strategy;
 
@@ -215,19 +215,20 @@ passport.use(
     }
   )
 );
+```
 
-
+```js
 // views/auth/login.hbs
 
 <a href="/auth/github">Login via Github</a>
+```
 
+#### We need to have this route
 
-We need to have this route
-
+```js
 // routes/auth.js
 
 router.get('/github', passport.authenticate('github'));
-
 
 router.get(
   '/github/callback',
@@ -236,113 +237,4 @@ router.get(
     failureRedirect: '/auth/login'
   })
 );
-
-****************************************************************************
-
-# Roles and authorization
-
-Show the Rooms model 
-
-Show the reference the owner field in the Rooms model 
-
-Add the post rooms route: 
-
-only logged in users can post - we want to enter the logged in user as ownder of the room
-
-// routes/rooms.js
-
-router.post('/', (req, res, next) => {
-  // if user is not logged in we redirect
-  if (!req.isAuthenticated()) {
-    res.redirect('/');
-    return;
-  }
-
-  Room.create({
-    price: req.body.price,
-    name: req.body.name,
-    description: req.body.description,
-    owner: req.user._id
-  })
-    .then(room => {
-      console.log(room);
-      res.redirect('/rooms');
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-When we list all routes we have to do that :
-
-// routes/rooms.js
-
-router.get('/', (req, res, next) => {
-  Room.find()
-    .then(rooms => {
-      res.render('rooms/index', { roomsList: rooms });
-    })
-    .catch(err => {
-      next(err);
-    });
-  // if you would want to only show the rooms that the user owns : 
-  // Room.find({ owner: req.user._id })
-  //   .then(rooms => {
-  //     res.render('rooms/index', { roomsList: rooms });
-  //   })
-  //   .catch(err => {
-  //     next(err);
-  //   });
-});
-
-
-Now add role to the user model
-
-// models/User.js
-
-const userSchema = new Schema({
-  username: String,
-  password: String,
-  githubId: String,
-  role: {
-    type: String,
-    enum: ['admin', 'user'],
-    default: 'user'
-  }
-});
-
-
-Now we add a delete route and check for the role there - the user can only delete rooms 
-where she or he is the owner - the admin can delete any room
-
-The click on the room on views/rooms/index.hbs deletes it
-
-// routes/rooms.js
-
-// deletes the room
-// an admin can delete any room - a user can only delete can only 
-// delete it when she is the owner
-router.get('/:roomId/', (req, res, next) => {
-  const query = { _id: req.params.roomId };
-
-  if (req.user.role !== 'admin') {
-    query.owner = req.user._id;
-  }
-
-  // if user.role !== 'admin'
-  // query: { _id: req.params.roomId, owner: req.user._id }
-  // else if user.role === 'admin'
-  // query; { _id: req.params.roomId }
-
-  Room.findOneAndDelete(query)
-    .then(() => {
-      res.redirect('/rooms');
-    })
-    .catch(err => {
-      next(err);
-    });
-});
-
-Bonus: 
-
-refactor the middleware loginCheck to routes/middleware.js and require it in routes/rooms
+```
