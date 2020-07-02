@@ -48,4 +48,23 @@ router.post('/', (req, res, next) => {
 });
 
 
+router.get('/:roomId/', (req, res, next) => {
+  const query = { _id: req.params.roomId };
+  console.log(req.user);
+  if (req.user.role !== 'admin') {
+    query.owner = req.user._id;
+    // so if the currently logged in user is not an admin the query will look like this
+    // { _id: req.params.roomId, owner: req.user._id };
+  }
+
+  Room.findOneAndDelete(query)
+    .then(() => {
+      res.redirect('/rooms')
+    })
+    .catch(err => {
+      next(err);
+    })
+});
+
+
 module.exports = router;

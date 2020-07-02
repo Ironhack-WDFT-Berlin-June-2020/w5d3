@@ -238,3 +238,11 @@ router.get(
   })
 );
 ```
+
+## Authorization
+
+#### The room has an owner field that gets set to the logged in users id when the room is created
+
+#### The model now also gets a role field
+
+#### When deleting a room we check for the role of the logged in user

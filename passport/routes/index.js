@@ -5,6 +5,7 @@ const router = express.Router();
 router.get('/', (req, res, next) => {
   // passport - req.user
   const user = req.user;
+
   console.log('req.user: ', req.user);
   res.render('index', { user: user });
 });
